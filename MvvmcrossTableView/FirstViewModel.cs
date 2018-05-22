@@ -15,15 +15,27 @@ namespace MvvmcrossTableView
         public FirstViewModel()
         {
 
-            ItemsGroup = new List<SessionGroup>();
-            for (int i=0; i<3; i++)
+            //ItemsGroup = new List<SessionGroup>();
+            //for (int i=0; i<3; i++)
+            //{
+            //    var list = new List<Item>();
+            //    for (int j=0; j<10; j++)
+            //    {
+            //        list.Add(new Item { Name = "Section:" + i + "Item" + j });
+            //    }
+            //    ItemsGroup.Add(new SessionGroup("section" + i, list));
+            //}
+
+
+            ItemsDic = new Dictionary<string, List<Item>>();
+            for (int i = 0; i < 3; i++)
             {
                 var list = new List<Item>();
-                for (int j=0; j<10; j++)
+                for (int j = 0; j < 10 + i; j++)
                 {
-                    list.Add(new Item { Name = "Section:" + i + "Item" + j });
+                    list.Add(new Item { Name = "Section:" + i + " Item" + j });
                 }
-                ItemsGroup.Add(new SessionGroup("section" + i, list));
+                ItemsDic.Add("section" + i, list);
             }
         }
 
@@ -38,6 +50,20 @@ namespace MvvmcrossTableView
             set
             {
                 _ItemsGroup = value;
+                RaisePropertyChanged(() => ItemsGroup);
+            }
+        }
+
+        private Dictionary<string, List<Item>> _ItemsDic;
+        public Dictionary<string, List<Item>> ItemsDic
+        {
+            get
+            {
+                return _ItemsDic;
+            }
+            set
+            {
+                _ItemsDic = value;
                 RaisePropertyChanged(() => ItemsGroup);
             }
         }

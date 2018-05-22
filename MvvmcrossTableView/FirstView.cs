@@ -10,6 +10,7 @@ using CoreGraphics;
 using MvvmCross.Platforms.Ios.Binding.Views;
 using System.Collections.Generic;
 using MvvmCross.Binding.Extensions;
+using System.Linq;
 
 namespace MvvmcrossTableView
 {
@@ -47,7 +48,7 @@ namespace MvvmcrossTableView
 
             var set = this.CreateBindingSet<FirstView, FirstViewModel>();
 
-            set.Bind(source).For(s => s.ItemsSource).To(vm => vm.ItemsGroup);
+            set.Bind(source).For(s => s.ItemsSource).To(vm => vm.ItemsDic);
 
             set.Apply();
         }
@@ -56,6 +57,8 @@ namespace MvvmcrossTableView
     public class TableSource : MvxTableViewSource
     {
         private static readonly NSString CellIdentifier = new NSString("MyTableViewCell");
+
+        private Dictionary<string, List<Item>> savedItemList;
 
         public TableSource(UITableView tableView)
                 : base(tableView)
@@ -74,28 +77,32 @@ namespace MvvmcrossTableView
 
         protected override object GetItemAt(NSIndexPath indexPath)
         {
-            var _sessionGroup = ItemsSource.ElementAt(indexPath.Section) as SessionGroup;
-            if (_sessionGroup == null)
-                return null;
-
-            return _sessionGroup[indexPath.Row];
+            return savedItemList.Values.ToList()[indexPath.Section][indexPath.Row];
         }
 
         public override nint NumberOfSections(UITableView tableView)
         {
-            return ItemsSource.Count();
+            if (ItemsSource != null)
+            {
+                savedItemList = (Dictionary<string, List<Item>>)ItemsSource;
+                return savedItemList.Count();
+            }           
+            return 0;
         }
 
         public override nint RowsInSection(UITableView tableview, nint section)
         {
-            var group = ItemsSource.ElementAt((int)section) as SessionGroup;
-            return group.Count();
+            if (ItemsSource != null)
+            {
+                savedItemList = (Dictionary<string, List<Item>>)ItemsSource;
+                return savedItemList.Values.ToList()[(int)section].Count;
+            }
+            return 0;
         }
 
         public override string TitleForHeader(UITableView tableView, nint section)
         {
-            var group = ItemsSource.ElementAt((int)section) as SessionGroup;
-            return string.Format($"Header for section {group.Key}");
+            return string.Format($"Header for section");
         }
     }
 }
